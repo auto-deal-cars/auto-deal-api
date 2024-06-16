@@ -25,7 +25,6 @@ provider:
     DATABASE_URL: ${env.DATABASE_URL}
     AUDIENCE_ISSUER_URL: ${env.AUDIENCE_ISSUER_URL}
     AUDIENCE_CLIENT_ID: ${env.AUDIENCE_CLIENT_ID}
-  architecture: arm64
 functions:
   create_vehicle:
     image:
