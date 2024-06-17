@@ -3,12 +3,17 @@ package:
   individually: true
 frameworkVersion: '3'
 useDotenv: true
+params:
+  default:
+    audienceIssuerUrl: ${env.AUDIENCE_ISSUER_URL}
+    audienceClientId: ${env.AUDIENCE_CLIENT_ID}
 provider:
   name: aws
   ecr:
     images:
       vehicle:
         path: ./vehicle
+        platform: linux/arm64
   stage: dev
   region: us-east-1
   runtime: python3.10
