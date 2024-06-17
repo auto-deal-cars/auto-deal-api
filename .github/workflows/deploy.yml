@@ -10,9 +10,6 @@ on:
 jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        architecture: [arm64]
 
     steps:
     - name: Checkout code
@@ -40,6 +37,9 @@ jobs:
         file_name: .env
       env:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
 
     - name: Deploy if tests pass
       if: success()
