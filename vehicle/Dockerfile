@@ -7,6 +7,6 @@ COPY ./application ${LAMBDA_TASK_ROOT}/vehicle/application
 COPY ./infrastructure ${LAMBDA_TASK_ROOT}/vehicle/infrastructure
 COPY ./__init__.py ${LAMBDA_TASK_ROOT}/
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 CMD ["vehicle.adapters.controllers.create_vehicle_controller.register_vehicle"]
