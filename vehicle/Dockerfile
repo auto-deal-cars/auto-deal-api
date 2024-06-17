@@ -1,5 +1,7 @@
 FROM public.ecr.aws/lambda/python:3.10
 
+RUN microdnf install -y mesa-libGL
+
 COPY ./requirements.txt ./
 COPY ./adapters ${LAMBDA_TASK_ROOT}/vehicle/adapters
 COPY ./domain ${LAMBDA_TASK_ROOT}/vehicle/domain
