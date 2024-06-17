@@ -2,6 +2,7 @@ service: auto-deal
 package:
   individually: true
 frameworkVersion: '3'
+useDotenv: true
 provider:
   name: aws
   ecr:
@@ -13,19 +14,19 @@ provider:
   runtime: python3.10
   timeout: 30
   deploymentMethod: direct
+  environment:
+    DATABASE_URL: ${env.DATABASE_URL}
+    AUDIENCE_ISSUER_URL: ${env.AUDIENCE_ISSUER_URL}
+    AUDIENCE_CLIENT_ID: ${env.AUDIENCE_CLIENT_ID}
   httpApi:
     cors: true
     authorizers:
       autoDealAuthorizer:
         type: jwt
         identitySource: $request.header.Authorization
-        issuerUrl: ${env.AUDIENCE_ISSUER_URL}
+        issuerUrl: ${param:audienceIssuerUrl}
         audience:
-          - ${env.AUDIENCE_CLIENT_ID}
-  environment:
-    DATABASE_URL: ${env.DATABASE_URL}
-    AUDIENCE_ISSUER_URL: ${env.AUDIENCE_ISSUER_URL}
-    AUDIENCE_CLIENT_ID: ${env.AUDIENCE_CLIENT_ID}
+          - ${param:audienceClientId}
   architecture: arm64
 functions:
   create_vehicle:
