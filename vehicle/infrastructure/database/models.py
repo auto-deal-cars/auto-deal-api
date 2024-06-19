@@ -30,7 +30,7 @@ class Vehicle(Base):
     color = Column(String)
     price = Column(Float)
     brand = relationship('VehicleBrand', back_populates='vehicles')
-    sold = relationship('VehicleSold', back_populates='vehicle')
+    sold = relationship('VehicleSold', uselist=False, back_populates='vehicle')
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
@@ -42,9 +42,9 @@ class VehicleSold(Base):
     """
     __tablename__ = 'vehicle_sold'
     order_id = Column(Integer, primary_key=True, index=True)
-    vehicle_id = Column(Integer, ForeignKey('vehicle.id'), nullable=False)
+    vehicle_id = Column(Integer, ForeignKey('vehicle.id'), nullable=False, unique=True)
     sold_price = Column(Float)
-    sold_date = Column(DateTime)
+    sold_date = Column(DateTime, default=datetime.now)
     user_id = Column(Integer)
     vehicle = relationship('Vehicle', back_populates='sold')
     created_at = Column(DateTime, default=datetime.now)

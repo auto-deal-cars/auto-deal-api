@@ -17,7 +17,7 @@ provider:
   stage: dev
   region: us-east-1
   runtime: python3.10
-  timeout: 30
+  timeout: 900
   deploymentMethod: direct
   environment:
     DATABASE_URL: ${env.DATABASE_URL}
@@ -71,6 +71,16 @@ functions:
       - httpApi:
           path: /vehicles
           method: get
+          authorizer:
+            name: autoDealAuthorizer
+  mark_vehicle_as_sold:
+    image:
+      name: vehicle
+      command: ["vehicle.adapters.controllers.mark_vehicle_as_sold_controller.mark_vehicle_as_sold"]
+    events:
+      - httpApi:
+          path: /vehicle/{id}/sold
+          method: put
           authorizer:
             name: autoDealAuthorizer
 plugins:
