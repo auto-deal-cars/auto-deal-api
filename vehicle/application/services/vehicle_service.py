@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from vehicle.domain.entities.vehicle import Vehicle
 from vehicle.application.ports.vehicle_repository import VehicleRepository
-from vehicle.infrastructure.database.models import Vehicle as VehicleModel
+from vehicle.infrastructure.database.models import Vehicle as VehicleModel, StatusEnum
 
 class VehicleService:
     """ This class contains the service for the vehicle application """
@@ -49,18 +49,27 @@ class VehicleService:
 
     def initialize_sale(self, vehicle_id: int, user_id: str) -> None:
         """ Initialize a sale for a Vehicle """
-        vehicle = self.get(vehicle_id)
+        vehicle = self.vehicle_repository.get_with_sold(vehicle_id)
+
+        if vehicle.sold is not None:
+            raise ValueError("Vehicle already sold")
 
         self.vehicle_repository.initialize_sale(vehicle, user_id)
 
     def confirm_sale(self, vehicle_id: int) -> None:
         """ Confirm a sale for a Vehicle """
-        vehicle = self.get(vehicle_id)
+        vehicle = self.vehicle_repository.get_with_sold(vehicle_id)
+
+        if vehicle.sold.status == StatusEnum.sold:
+            raise ValueError("Vehicle already sold")
 
         self.vehicle_repository.confirm_sale(vehicle)
 
     def revert_sale(self, vehicle_id: int) -> None:
         """ Revert a sale for a Vehicle """
-        vehicle = self.get(vehicle_id)
+        vehicle = self.vehicle_repository.get_with_sold(vehicle_id)
+
+        if vehicle.sold is None or vehicle.sold.status == StatusEnum.sold:
+            raise ValueError("Vehicle sale not initialized or already sold")
 
         self.vehicle_repository.revert_sale(vehicle)

@@ -19,7 +19,7 @@ def revert_sale(event, context):
         service.revert_sale(vehicle_id)
 
         return {
-            'statusCode': 201,
+            'statusCode': 200,
             'body': json.dumps({
                 'message': 'Reverted sale successfully!',
             })

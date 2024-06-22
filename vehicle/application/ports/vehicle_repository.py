@@ -34,6 +34,13 @@ class VehicleRepository(ABC):
         pass
 
     @abstractmethod
+    def get_with_sold(self, vehicle_id: int) -> Vehicle:
+        """
+        This method gets a vehicle from the database with the sold status.
+        """
+        pass
+
+    @abstractmethod
     def get_all_available(self) -> List[VehicleEntity]:
         """
         This method gets all available vehicles from the database.

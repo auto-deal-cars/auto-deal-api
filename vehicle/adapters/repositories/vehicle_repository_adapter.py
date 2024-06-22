@@ -92,6 +92,13 @@ class VehicleRepositoryAdapter(VehicleRepository):
             price=vehicle.price
         )
 
+    def get_with_sold(self, vehicle_id: int) -> Vehicle | None:
+        """
+        Get a vehicle by its id with the sold status.
+        """
+        vehicle = self.db.query(Vehicle).filter(Vehicle.id == vehicle_id).first()
+        return vehicle
+
     def get_all_available(self) -> List[VehicleEntity]:
         """
         Get all available vehicles from the database.
@@ -108,14 +115,7 @@ class VehicleRepositoryAdapter(VehicleRepository):
             year=vehicle.year,
             color=vehicle.color,
             price=vehicle.price,
-            sold=VehicleSoldEntity(
-                order_id=vehicle.sold.order_id,
-                vehicle_id=vehicle.sold.vehicle_id,
-                status=vehicle.sold.status,
-                sold_date=vehicle.sold.sold_date.isoformat(),
-                user_id=vehicle.sold.user_id,
-                sold_price=vehicle.sold.sold_price,
-            ).model_dump() if vehicle.sold else None
+            sold=None
             ) for vehicle in vehicles]
 
         return vehicles_list

@@ -58,8 +58,8 @@ def initialize_sale(event, context):
                 'message': 'Vehicle not found'
             })
         }
-    except Exception as e:
-        print(e)
+    except Exception as error:
+        print(error)
         return {
             'statusCode': 500,
             'body': json.dumps({

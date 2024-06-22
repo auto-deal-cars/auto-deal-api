@@ -90,7 +90,7 @@ functions:
     events:
       - httpApi:
           path: /vehicle/{id}/initialize-sale
-          method: put
+          method: post
           authorizer:
             name: autoDealAuthorizer
   confirm_sale:
@@ -110,7 +110,7 @@ functions:
     events:
       - httpApi:
           path: /vehicle/{id}/revert-sale
-          method: put
+          method: delete
           authorizer:
             name: autoDealAuthorizer
 plugins:

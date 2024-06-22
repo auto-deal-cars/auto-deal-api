@@ -20,7 +20,7 @@ def confirm_sale(event, context):
         service.confirm_sale(vehicle_id)
 
         return {
-            'statusCode': 201,
+            'statusCode': 200,
             'body': json.dumps({
                 'message': 'Vehicle confirmed as sold successfully!',
             })
