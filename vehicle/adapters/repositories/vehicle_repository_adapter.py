@@ -2,9 +2,11 @@
 This class contains the repository for the vehicle application.
 """
 from typing import List
+from datetime import datetime
 from sqlalchemy.orm import Session
 
 from vehicle.domain.entities.vehicle import Vehicle as VehicleEntity
+from vehicle.domain.entities.vehicle_sold import VehicleSold as VehicleSoldEntity
 from vehicle.application.ports.vehicle_repository import VehicleRepository
 from vehicle.infrastructure.database.models import Vehicle, VehicleBrand, VehicleSold
 
@@ -94,23 +96,63 @@ class VehicleRepositoryAdapter(VehicleRepository):
         """
         Get all available vehicles from the database.
         """
-        vehicles = self.db.query(Vehicle).filter(Vehicle.sold is None).all()
+        vehicles = self.db.query(Vehicle) \
+            .filter(Vehicle.sold == None) \
+            .order_by(Vehicle.price) \
+            .all()
 
-        return [VehicleEntity(
+        vehicles_list = [VehicleEntity(
             id=vehicle.id,
             brand_name=vehicle.brand.name,
             model=vehicle.model,
             year=vehicle.year,
             color=vehicle.color,
-            price=vehicle.price
-        ) for vehicle in vehicles]
+            price=vehicle.price,
+            sold=VehicleSoldEntity(
+                order_id=vehicle.sold.order_id,
+                vehicle_id=vehicle.sold.vehicle_id,
+                status=vehicle.sold.status,
+                sold_date=vehicle.sold.sold_date.isoformat(),
+                user_id=vehicle.sold.user_id,
+                sold_price=vehicle.sold.sold_price,
+            ).model_dump() if vehicle.sold else None
+            ) for vehicle in vehicles]
 
-    def mark_vehicle_as_sold(self, vehicle_id: int, user_id: str) -> None:
-        """
-        Mark a vehicle as sold in the database.
-        """
-        vehicle = self.get(vehicle_id)
+        return vehicles_list
 
+    def get_all_sold(self) -> List[VehicleEntity]:
+        """
+        Get all sold vehicles from the database.
+        """
+        vehicles = self.db.query(Vehicle) \
+            .filter(Vehicle.sold != None) \
+            .order_by(Vehicle.price) \
+            .all()
+
+        vehicles_list = [VehicleEntity(
+            id=vehicle.id,
+            brand_name=vehicle.brand.name,
+            model=vehicle.model,
+            year=vehicle.year,
+            color=vehicle.color,
+            price=vehicle.price,
+            sold=VehicleSoldEntity(
+                order_id=vehicle.sold.order_id,
+                vehicle_id=vehicle.sold.vehicle_id,
+                status=vehicle.sold.status,
+                sold_date=vehicle.sold.sold_date.isoformat(),
+                user_id=vehicle.sold.user_id,
+                sold_price=vehicle.sold.sold_price,
+            ).model_dump() if vehicle.sold else None
+            ) for vehicle in vehicles]
+
+        return vehicles_list
+
+    def initialize_sale(self, vehicle: Vehicle, user_id: str) -> None:
+        """
+        Initialize a sale in the database.
+        Marking vehicle as sold and creating a new VehicleSold object.
+        """
         sold_vehicle = VehicleSold(
             vehicle_id=vehicle.id,
             sold_price=vehicle.price,
@@ -120,6 +162,22 @@ class VehicleRepositoryAdapter(VehicleRepository):
         self.db.add(sold_vehicle)
         self.db.commit()
         self.db.refresh(sold_vehicle)
+
+        vehicle.sold = sold_vehicle
+
+        self.db.commit()
+        self.db.refresh(vehicle)
+
+    def confirm_sale(self, vehicle: Vehicle) -> None:
+        """
+        Confirm a sale for a vehicle in the database.
+        """
+        self.db.query(VehicleSold).filter(VehicleSold.vehicle_id == vehicle.id).update({
+            'status': 'sold',
+            'sold_price': vehicle.price,
+            'sold_date': datetime.now(),
+        })
+        self.db.commit()
 
     def get_brand(self, brand_name: str) -> VehicleBrand | None:
         """
@@ -140,3 +198,17 @@ class VehicleRepositoryAdapter(VehicleRepository):
         self.db.refresh(new_brand)
 
         return new_brand
+
+    def revert_sale(self, vehicle: Vehicle) -> None:
+        """
+        Revert a sale for a vehicle in the database.
+        """
+        vehicle_sold = self.db.query(VehicleSold) \
+            .filter(VehicleSold.vehicle_id == vehicle.id) \
+            .first()
+
+        if vehicle_sold is None or vehicle_sold.status != "sold":
+            raise ValueError(f"Error while reverting sale for vehicle {vehicle.id}")
+
+        self.db.delete(vehicle_sold)
+        self.db.commit()

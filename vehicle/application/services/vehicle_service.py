@@ -4,6 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from vehicle.domain.entities.vehicle import Vehicle
 from vehicle.application.ports.vehicle_repository import VehicleRepository
+from vehicle.infrastructure.database.models import Vehicle as VehicleModel
 
 class VehicleService:
     """ This class contains the service for the vehicle application """
@@ -30,7 +31,7 @@ class VehicleService:
 
         return vehicle
 
-    def get(self, vehicle_id: int) -> Vehicle:
+    def get(self, vehicle_id: int) -> VehicleModel:
         """ Get a Vehicle by its ID """
         vehicle = self.vehicle_repository.get(vehicle_id)
         if vehicle is None:
@@ -42,10 +43,24 @@ class VehicleService:
         """ Get all available Vehicles """
         return self.vehicle_repository.get_all_available()
 
-    def mark_vehicle_as_sold(self, vehicle_id: int, user_id: str) -> None:
-        """ Mark a Vehicle as sold """
-        vehicle = self.get(vehicle_id)
-        if vehicle is None:
-            raise NoResultFound(f"Vehicle with ID {vehicle_id} not found")
+    def get_all_sold(self) -> List[Vehicle]:
+        """ Get all sold Vehicles """
+        return self.vehicle_repository.get_all_sold()
 
-        self.vehicle_repository.mark_vehicle_as_sold(vehicle_id, user_id)
+    def initialize_sale(self, vehicle_id: int, user_id: str) -> None:
+        """ Initialize a sale for a Vehicle """
+        vehicle = self.get(vehicle_id)
+
+        self.vehicle_repository.initialize_sale(vehicle, user_id)
+
+    def confirm_sale(self, vehicle_id: int) -> None:
+        """ Confirm a sale for a Vehicle """
+        vehicle = self.get(vehicle_id)
+
+        self.vehicle_repository.confirm_sale(vehicle)
+
+    def revert_sale(self, vehicle_id: int) -> None:
+        """ Revert a sale for a Vehicle """
+        vehicle = self.get(vehicle_id)
+
+        self.vehicle_repository.revert_sale(vehicle)

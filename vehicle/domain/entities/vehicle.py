@@ -14,3 +14,4 @@ class Vehicle(BaseModel):
     year: int = Field(..., ge=1886, description="Year")
     color: str = Field(..., min_length=1, max_length=50, description="Color")
     price: float = Field(..., gt=0, description="Price")
+    sold: Optional[dict] = Field(default=None, description="Vehicle sold")

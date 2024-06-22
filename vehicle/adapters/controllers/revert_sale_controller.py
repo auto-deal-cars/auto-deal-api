@@ -6,32 +6,22 @@ from vehicle.application.services.vehicle_service import VehicleService
 from vehicle.adapters.repositories.vehicle_repository_adapter import VehicleRepositoryAdapter
 from vehicle.infrastructure.database.setup import get_db
 
-def mark_vehicle_as_sold(event, context):
-    """ Mark a Vehicle as sold """
-    print(json.dumps(event))
+def revert_sale(event, context):
+    """ Revert a sale for a Vehicle """
     try:
         vehicle_id = event.get('pathParameters', {}).get('id')
-        user_id = (
-            event
-            .get('requestContext', {})
-            .get('authorizer', {})
-            .get('jwt', {})
-            .get('claims', {})
-            .get('sub')
-        )
-
-        if not vehicle_id or not user_id:
-            raise KeyError('Vehicle ID and User ID are required')
+        if not vehicle_id:
+            raise KeyError('Vehicle ID is required')
 
         db = next(get_db())
         repository = VehicleRepositoryAdapter(db)
         service = VehicleService(repository)
-        service.mark_vehicle_as_sold(vehicle_id, user_id)
+        service.revert_sale(vehicle_id)
 
         return {
             'statusCode': 201,
             'body': json.dumps({
-                'message': 'Vehicle marked as sold successfully!',
+                'message': 'Reverted sale successfully!',
             })
         }
     except ValidationError as error:
@@ -59,10 +49,11 @@ def mark_vehicle_as_sold(event, context):
                 'message': 'Vehicle not found'
             })
         }
-    except Exception:
+    except Exception as e:
+        print(e)
         return {
             'statusCode': 500,
             'body': json.dumps({
-                'message': 'An error occurred while marking the vehicle as sold',
+                'message': 'An error occurred while reverting the sale',
             })
         }

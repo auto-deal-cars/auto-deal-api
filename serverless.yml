@@ -73,13 +73,43 @@ functions:
           method: get
           authorizer:
             name: autoDealAuthorizer
-  mark_vehicle_as_sold:
+  list_sold_vehicles:
     image:
       name: vehicle
-      command: ["vehicle.adapters.controllers.mark_vehicle_as_sold_controller.mark_vehicle_as_sold"]
+      command: ["vehicle.adapters.controllers.list_sold_vehicles_controller.list_sold_vehicles"]
     events:
       - httpApi:
-          path: /vehicle/{id}/sold
+          path: /vehicles/sold
+          method: get
+          authorizer:
+            name: autoDealAuthorizer
+  initialize_sale:
+    image:
+      name: vehicle
+      command: ["vehicle.adapters.controllers.initialize_sale_controller.initialize_sale"]
+    events:
+      - httpApi:
+          path: /vehicle/{id}/initialize-sale
+          method: put
+          authorizer:
+            name: autoDealAuthorizer
+  confirm_sale:
+    image:
+      name: vehicle
+      command: ["vehicle.adapters.controllers.confirm_sale_controller.confirm_sale"]
+    events:
+      - httpApi:
+          path: /vehicle/{id}/confirm-sale
+          method: put
+          authorizer:
+            name: autoDealAuthorizer
+  revert_sale:
+    image:
+      name: vehicle
+      command: ["vehicle.adapters.controllers.revert_sale_controller.revert_sale"]
+    events:
+      - httpApi:
+          path: /vehicle/{id}/revert-sale
           method: put
           authorizer:
             name: autoDealAuthorizer

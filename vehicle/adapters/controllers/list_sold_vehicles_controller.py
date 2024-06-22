@@ -6,13 +6,13 @@ from vehicle.application.services.vehicle_service import VehicleService
 from vehicle.adapters.repositories.vehicle_repository_adapter import VehicleRepositoryAdapter
 from vehicle.infrastructure.database.setup import get_db
 
-def list_available_vehicles(event, context):
-    """ List Available Vehicles """
+def list_sold_vehicles(event, context):
+    """ List Sold Vehicles """
     try:
         db = next(get_db())
         repository = VehicleRepositoryAdapter(db)
         service = VehicleService(repository)
-        vehicles = service.get_all_available()
+        vehicles = service.get_all_sold()
 
         vehicles_dict = [vehicle.model_dump() for vehicle in vehicles]
 
@@ -36,6 +36,6 @@ def list_available_vehicles(event, context):
         return {
             'statusCode': 500,
             'body': json.dumps({
-                'message': 'An error occurred while getting the vehicle',
+                'message': 'An error occurred while getting the sold vehicles',
             })
         }

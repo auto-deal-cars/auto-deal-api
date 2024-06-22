@@ -4,45 +4,67 @@ This module contains the repository for the vehicle application.
 from abc import ABC, abstractmethod
 
 from typing import List
-from vehicle.domain.entities.vehicle import Vehicle
+from vehicle.domain.entities.vehicle import Vehicle as VehicleEntity
 from vehicle.domain.entities.vehicle_brand import VehicleBrand
+from vehicle.infrastructure.database.models import Vehicle
 
 class VehicleRepository(ABC):
     """
     This class contains the repository for the vehicle application.
     """
     @abstractmethod
-    def save(self, vehicle: Vehicle) -> Vehicle:
+    def save(self, vehicle: VehicleEntity) -> VehicleEntity:
         """
         This method saves a vehicle to the database.
         """
         pass
 
     @abstractmethod
-    def update(self, vehicle_id: int, vehicle: Vehicle) -> Vehicle:
+    def update(self, vehicle_id: int, vehicle: VehicleEntity) -> VehicleEntity:
         """
         This method updates a vehicle in the database.
         """
         pass
 
     @abstractmethod
-    def get(self, vehicle_id: int) -> Vehicle:
+    def get(self, vehicle_id: int) -> VehicleEntity:
         """
         This method gets a vehicle from the database.
         """
         pass
 
     @abstractmethod
-    def get_all_available(self) -> List[Vehicle]:
+    def get_all_available(self) -> List[VehicleEntity]:
         """
         This method gets all available vehicles from the database.
         """
         pass
 
     @abstractmethod
-    def mark_vehicle_as_sold(self, vehicle_id: int, user_id: str) -> None:
+    def get_all_sold(self) -> List[VehicleEntity]:
         """
-        This method marks a vehicle as sold in the database.
+        This method gets all sold vehicles from the database.
+        """
+        pass
+
+    @abstractmethod
+    def initialize_sale(self, vehicle: Vehicle, user_id: str) -> None:
+        """
+        This method initializes a sale for a vehicle in the database.
+        """
+        pass
+
+    @abstractmethod
+    def confirm_sale(self, vehicle: Vehicle) -> None:
+        """
+        This method confirms a sale for a vehicle in the database.
+        """
+        pass
+
+    @abstractmethod
+    def revert_sale(self, vehicle: Vehicle) -> None:
+        """
+        This method reverts a sale for a vehicle in the database.
         """
         pass
 

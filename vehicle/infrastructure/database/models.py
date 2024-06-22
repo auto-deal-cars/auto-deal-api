@@ -53,7 +53,7 @@ class VehicleSold(Base):
     status = Column(Enum(StatusEnum), default=StatusEnum.draft, nullable=False)
     sold_price = Column(Float, nullable=False)
     sold_date = Column(DateTime, default=datetime.now)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(String, nullable=False)
     vehicle = relationship('Vehicle', back_populates='sold')
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
