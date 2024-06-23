@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from vehicle.domain.entities.vehicle import Vehicle
 from vehicle.application.ports.vehicle_repository import VehicleRepository
-from vehicle.infrastructure.database.models import Vehicle as VehicleModel, StatusEnum
+from vehicle.infrastructure.database.models import StatusEnum
 
 class VehicleService:
     """ This class contains the service for the vehicle application """
@@ -26,12 +26,11 @@ class VehicleService:
             raise NoResultFound(f"Vehicle with ID {vehicle_id} not found")
 
         vehicle = Vehicle(**vehicle_data)
-
         vehicle = self.vehicle_repository.update(vehicle_id, vehicle)
 
         return vehicle
 
-    def get(self, vehicle_id: int) -> VehicleModel:
+    def get(self, vehicle_id: int) -> Vehicle:
         """ Get a Vehicle by its ID """
         vehicle = self.vehicle_repository.get(vehicle_id)
         if vehicle is None:
@@ -59,6 +58,8 @@ class VehicleService:
     def confirm_sale(self, vehicle_id: int) -> None:
         """ Confirm a sale for a Vehicle """
         vehicle = self.vehicle_repository.get_with_sold(vehicle_id)
+
+        print(vehicle.sold.status == StatusEnum.sold)
 
         if vehicle.sold.status == StatusEnum.sold:
             raise ValueError("Vehicle already sold")

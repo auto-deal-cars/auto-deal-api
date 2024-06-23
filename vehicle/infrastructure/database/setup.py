@@ -13,15 +13,21 @@ def is_running_with_alembic():
     """
     return 'alembic' in sys.modules
 
-# Load environment variables if running with Alembic
-if is_running_with_alembic():
-    load_dotenv()
+def setup_database():
+    """
+    Setup the database connection and session.
+    """
+    if is_running_with_alembic():
+        load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+    database_url = os.getenv("DATABASE_URL") or "sqlite:///:memory:"
+    engine = create_engine(database_url)
+    session_local = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    base = declarative_base()
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+    return engine, session_local, base
+
+engine, SessionLocal, Base = setup_database()
 
 def get_db():
     """
