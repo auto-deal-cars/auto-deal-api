@@ -121,6 +121,46 @@ functions:
           documentation: ${file(serverless.doc.yml):endpoints.revert_sale}
           authorizer:
             name: autoDealAuthorizer
+  list_sold_vehicles:
+    image:
+      name: vehicle
+      command: ["vehicle.adapters.controllers.list_sold_vehicles_controller.list_sold_vehicles"]
+    events:
+      - httpApi:
+          path: /vehicles/sold
+          method: get
+          authorizer:
+            name: autoDealAuthorizer
+  initialize_sale:
+    image:
+      name: vehicle
+      command: ["vehicle.adapters.controllers.initialize_sale_controller.initialize_sale"]
+    events:
+      - httpApi:
+          path: /vehicle/{id}/initialize-sale
+          method: post
+          authorizer:
+            name: autoDealAuthorizer
+  confirm_sale:
+    image:
+      name: vehicle
+      command: ["vehicle.adapters.controllers.confirm_sale_controller.confirm_sale"]
+    events:
+      - httpApi:
+          path: /vehicle/{id}/confirm-sale
+          method: put
+          authorizer:
+            name: autoDealAuthorizer
+  revert_sale:
+    image:
+      name: vehicle
+      command: ["vehicle.adapters.controllers.revert_sale_controller.revert_sale"]
+    events:
+      - httpApi:
+          path: /vehicle/{id}/revert-sale
+          method: delete
+          authorizer:
+            name: autoDealAuthorizer
 plugins:
   - serverless-dotenv-plugin
   - serverless-openapi-documenter
