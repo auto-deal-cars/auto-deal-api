@@ -7,6 +7,7 @@ params:
   default:
     audienceIssuerUrl: ${env.AUDIENCE_ISSUER_URL}
     audienceClientId: ${env.AUDIENCE_CLIENT_ID}
+    initializePaymentQueueUrl: ${env.INITIALIZE_PAYMENT_QUEUE_URL}
 provider:
   name: aws
   ecr:
@@ -19,10 +20,20 @@ provider:
   runtime: python3.10
   timeout: 900
   deploymentMethod: direct
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource:
+            - ${param:initializePaymentQueueUrl}
   environment:
     DATABASE_URL: ${env.DATABASE_URL}
     AUDIENCE_ISSUER_URL: ${env.AUDIENCE_ISSUER_URL}
     AUDIENCE_CLIENT_ID: ${env.AUDIENCE_CLIENT_ID}
+    INITIALIZE_PAYMENT_QUEUE_URL: ${env.INITIALIZE_PAYMENT_QUEUE_URL}
+    INITIALIZE_PAYMENT_QUEUE_ARN: ${env.INITIALIZE_PAYMENT_QUEUE_ARN}
   httpApi:
     cors: true
     authorizers:
