@@ -8,6 +8,13 @@ from vehicle.application.services.vehicle_service import VehicleService
 from vehicle.application.ports.vehicle_repository import VehicleRepository
 from vehicle.domain.entities.vehicle_sold import VehicleSold
 
+@pytest.fixture(autouse=True)
+def mock_boto3_client():
+    """Fixture to mock boto3 client."""
+    with patch("boto3.client") as mock_boto_client:
+        mock_boto_client.return_value = create_autospec(boto3.client('sqs'))
+        yield mock_boto_client
+
 @pytest.fixture
 def vehicle_repository() -> VehicleRepository:
     """Fixture for VehicleRepository."""
@@ -150,9 +157,6 @@ def test_initialize_sale(
             vehicle_repository,
             'initialize_sale',
             return_value=mocked_vehicle_entity_with_sold
-        ), patch(
-            "boto3.client"
-        ) as mock_boto_client:
-        mock_boto_client.return_value = create_autospec(boto3.client('sqs'))
+        ):
         vehicle_service.initialize_sale(22, 1)
         vehicle_repository.initialize_sale.assert_called_once()
