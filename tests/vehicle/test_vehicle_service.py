@@ -1,19 +1,11 @@
 """Test for VehicleService."""
 from unittest.mock import create_autospec, patch
 import pytest
-import boto3
 
 from vehicle.domain.entities.vehicle import Vehicle
 from vehicle.application.services.vehicle_service import VehicleService
 from vehicle.application.ports.vehicle_repository import VehicleRepository
 from vehicle.domain.entities.vehicle_sold import VehicleSold
-
-@pytest.fixture(autouse=True)
-def mock_boto3_client():
-    """Fixture to mock boto3 client."""
-    with patch("boto3.client") as mock_boto_client:
-        mock_boto_client.return_value = create_autospec(boto3.client('sqs'))
-        yield mock_boto_client
 
 @pytest.fixture
 def vehicle_repository() -> VehicleRepository:
