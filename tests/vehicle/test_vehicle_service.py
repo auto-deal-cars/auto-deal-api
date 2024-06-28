@@ -1,6 +1,7 @@
 """Test for VehicleService."""
 from unittest.mock import create_autospec, patch
 import pytest
+import boto3
 
 from vehicle.domain.entities.vehicle import Vehicle
 from vehicle.application.services.vehicle_service import VehicleService
@@ -149,6 +150,9 @@ def test_initialize_sale(
             vehicle_repository,
             'initialize_sale',
             return_value=mocked_vehicle_entity_with_sold
-        ):
+        ), patch(
+            "boto3.client"
+        ) as mock_boto_client:
+        mock_boto_client.return_value = create_autospec(boto3.client('sqs'))
         vehicle_service.initialize_sale(22, 1)
         vehicle_repository.initialize_sale.assert_called_once()
