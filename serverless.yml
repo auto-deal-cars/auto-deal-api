@@ -115,26 +115,36 @@ functions:
       name: vehicle
       command: ["vehicle.adapters.controllers.confirm_sale_controller.confirm_sale"]
     events:
-      - httpApi:
-          path: /vehicle/{id}/confirm-sale
-          method: put
-          documentation: ${file(serverless.doc.yml):endpoints.confirm_sale}
-          authorizer:
-            name: autoDealAuthorizer
+      - sqs:
+          arn:
+            Fn::GetAtt: ["SuccessPaymentQueue", "Arn"]
   revert_sale:
     image:
       name: vehicle
       command: ["vehicle.adapters.controllers.revert_sale_controller.revert_sale"]
     events:
-      - httpApi:
-          path: /vehicle/{id}/revert-sale
-          method: delete
-          documentation: ${file(serverless.doc.yml):endpoints.revert_sale}
-          authorizer:
-            name: autoDealAuthorizer
+      - sqs:
+          arn:
+            Fn::GetAtt: ["FailedPaymentQueue", "Arn"]
+
 plugins:
   - serverless-dotenv-plugin
   - serverless-openapi-documenter
+
+resources:
+  Resources:
+    SuccessPaymentQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: success-payment-queue
+        VisibilityTimeout: 30
+        MessageRetentionPeriod: 300
+    FailedPaymentQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: failed-payment-queue
+        VisibilityTimeout: 30
+        MessageRetentionPeriod: 300
 
 configValidationMode: warn
 
