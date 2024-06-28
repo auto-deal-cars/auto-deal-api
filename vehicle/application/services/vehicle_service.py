@@ -11,7 +11,7 @@ from vehicle.domain.entities.vehicle import Vehicle
 from vehicle.application.ports.vehicle_repository import VehicleRepository
 from vehicle.infrastructure.database.models import StatusEnum
 
-sqs = boto3.client("sqs")
+sqs = boto3.client("sqs", region_name="us-east-1")
 initialize_payment_queue_url = os.getenv("INITIALIZE_PAYMENT_QUEUE_URL")
 
 class VehicleService:
